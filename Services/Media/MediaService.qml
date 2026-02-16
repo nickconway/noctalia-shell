@@ -35,6 +35,7 @@ Singleton {
   property string trackArtist: currentPlayer ? (currentPlayer.trackArtist || "") : ""
   property string trackAlbum: currentPlayer ? (currentPlayer.trackAlbum || "") : ""
   property string trackArtUrl: currentPlayer ? (currentPlayer.trackArtUrl || "") : ""
+  property string dbusName: currentPlayer ? (currentPlayer.dbusName || "") : ""
   property real trackLength: currentPlayer ? ((currentPlayer.length < infiniteTrackLength) ? currentPlayer.length : 0) : 0
   property bool canPlay: currentPlayer ? currentPlayer.canPlay : false
   property bool canPause: currentPlayer ? currentPlayer.canPause : false
@@ -44,6 +45,10 @@ Singleton {
   property string positionString: formatTime(currentPosition)
   property string lengthString: formatTime(trackLength)
   property real infiniteTrackLength: 922337203685
+
+  property string previousMediaTitle: ""
+  property string previousMediaArtist: ""
+  property bool previousMediaIsPlaying: false
 
   Component.onCompleted: {
     updateCurrentPlayer();
@@ -290,6 +295,34 @@ Singleton {
       target.position = seekPosition;
       currentPosition = seekPosition;
     }
+  }
+
+  function hasMeaningfulChange() {
+    const title = trackTitle || "";
+    const artist = trackArtist || "";
+
+    // Only show toast if something meaningful changed
+    const titleChanged = title !== previousMediaTitle && title !== "";
+    const playStateChanged = isPlaying !== previousMediaIsPlaying;
+    const hasMedia = title !== "" || artist !== "";
+
+    const player = (MediaService.playerIdentity || "").toLowerCase();
+    const browsers = ["firefox", "chromium", "chrome", "brave", "edge", "opera", "vivaldi", "zen"];
+    const isBrowser = browsers.some(b => player.includes(b));
+
+    // Browser Specific Logic:
+    // If a browser reports a new title but is PAUSED, ignore it.
+    if (isBrowser && !isPlaying && titleChanged) {
+      previousMediaTitle = title;
+      previousMediaArtist = artist;
+      previousMediaIsPlaying = isPlaying;
+      return false;
+    }
+
+    previousMediaTitle = title;
+    previousMediaArtist = artist;
+    previousMediaIsPlaying = isPlaying;
+    return true;
   }
 
   // Update progress bar every second while playing

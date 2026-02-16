@@ -169,4 +169,18 @@ ColumnLayout {
                               Quickshell.execDetached(["sh", "-lc", val + " test"]);
                             })
   }
+
+  // Media Hook
+  HookRow {
+    label: I18n.tr("panels.hooks.media-label")
+    description: I18n.tr("panels.hooks.media-description")
+    value: Settings.data.hooks.mediaChange
+      onEditClicked: openEdit(label, description, I18n.tr("panels.hooks.media-placeholder"), value, newValue => {
+                              Settings.data.hooks.mediaChange = newValue;
+                              Settings.saveImmediate();
+                            }, val => {
+                                if (val)
+                                Quickshell.execDetached(["sh", "-lc", val + " test"]);
+                            })
+  }
 }

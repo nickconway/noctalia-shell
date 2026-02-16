@@ -1283,7 +1283,10 @@
       "title": "Hooks",
       "wallpaper-changed-description": "Command to be executed when wallpaper changes.",
       "wallpaper-changed-label": "Wallpaper changed",
-      "wallpaper-changed-placeholder": "e.g. notify-send \"Wallpaper\" \"Changed\""
+      "wallpaper-changed-placeholder": "e.g. notify-send \"Wallpaper\" \"Changed\"",
+      "media-description": "Command to be executed when media changes.",
+      "media-label": "Media changed",
+      "media-placeholder": "e.g. notify-send \"$1\" \"$2\""
     },
     "idle": {
       "custom-add": "Add command",

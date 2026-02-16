@@ -7,6 +7,8 @@ import qs.Commons
 import qs.Services.Power
 import qs.Services.Theming
 import qs.Services.UI
+import qs.Services.Media
+import qs.Services.System
 
 Singleton {
   id: root
@@ -104,6 +106,29 @@ Singleton {
         executePerformanceModeDisabledHook();
       }
       wasPerformanceModeEnabled = isEnabled;
+    }
+  }
+
+  Connections {
+    target: MediaService
+    function onTrackTitleChanged() {
+      if (MediaService.trackTitle !== "")
+        executeMediaHook(MediaService.dbusName, MediaService.trackTitle, MediaService.trackAlbum, MediaService.trackArtist);
+    }
+
+    function onTrackAlbumChanged() {
+      if (MediaService.trackAlbum !== "")
+        executeMediaHook(MediaService.dbusName, MediaService.trackTitle, MediaService.trackAlbum, MediaService.trackArtist);
+    }
+
+    function onTrackArtistChanged() {
+      if (MediaService.trackArtist !== "")
+        executeMediaHook(MediaService.dbusName, MediaService.trackTitle, MediaService.trackAlbum, MediaService.trackArtist);
+    }
+
+    function onIsPlayingChanged() {
+      if (MediaService.isPlaying !== "")
+        executeMediaHook(MediaService.dbusName, MediaService.trackTitle, MediaService.trackAlbum, MediaService.trackArtist);
     }
   }
 
@@ -287,6 +312,35 @@ Singleton {
 
     Logger.i("HooksService", `Executing session hook for ${action}`);
     runPowerHook(`${script} ${action}`, callback);
+  }
+
+  function executeMediaHook(player, title, album, artist) {
+    if (!NotificationService.mediaInitialized)
+      return;
+
+    if (!Settings.data.hooks?.enabled) {
+      return;
+    }
+
+    const script = Settings.data.hooks?.mediaChange;
+    if (!script || script === "") {
+      return;
+    }
+
+    if (!MediaService.hasMeaningfulChange())
+      return;
+
+    try {
+      let command = script.replace(/\$1/g, `"${player}"` || "");
+      command = command.replace(/\$2/g, `"${title}"` || "");
+      command = command.replace(/\$3/g, `"${album}"` || "");
+      command = command.replace(/\$4/g, `"${artist}"` || "");
+
+      Quickshell.execDetached(["sh", "-lc", command]);
+      Logger.i("HooksService", `Executed media change hook: ${command}`);
+    } catch (e) {
+      Logger.e("HooksService", `Failed to execute media change hook: ${e}`);
+    }
   }
 
   // Execute startup hook

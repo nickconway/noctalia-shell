@@ -1124,14 +1124,14 @@ Singleton {
   property string previousMediaTitle: ""
   property string previousMediaArtist: ""
   property bool previousMediaIsPlaying: false
-  property bool mediaToastInitialized: false
+  property bool mediaInitialized: false
 
   Timer {
-    id: mediaToastInitTimer
+    id: mediaInitTimer
     interval: 3000 // Wait 3 seconds after startup to avoid initial toast
     running: true
     onTriggered: {
-      root.mediaToastInitialized = true;
+      root.mediaInitialized = true;
       root.previousMediaTitle = MediaService.trackTitle;
       root.previousMediaArtist = MediaService.trackArtist;
       root.previousMediaIsPlaying = MediaService.isPlaying;
@@ -1147,7 +1147,7 @@ Singleton {
   }
 
   function checkMediaToast() {
-    if (!Settings.data.notifications.enableMediaToast || !mediaToastInitialized)
+    if (!Settings.data.notifications.enableMediaToast || !mediaInitialized)
       return;
 
     if (doNotDisturb || PowerProfileService.noctaliaPerformanceMode)
@@ -1168,23 +1168,8 @@ Singleton {
       return;
     }
 
-    const title = MediaService.trackTitle || "";
-    const artist = MediaService.trackArtist || "";
-    const isPlaying = MediaService.isPlaying;
-
-    // Only show toast if something meaningful changed
-    const titleChanged = title !== previousMediaTitle && title !== "";
-    const playStateChanged = isPlaying !== previousMediaIsPlaying;
-    const hasMedia = title !== "" || artist !== "";
-
-    // Browser Specific Logic:
-    // If a browser reports a new title but is PAUSED, ignore it.
-    if (isBrowser && !isPlaying && titleChanged) {
-      previousMediaTitle = title;
-      previousMediaArtist = artist;
-      previousMediaIsPlaying = isPlaying;
+    if (!MediaService.hasMeaningfulChange())
       return;
-    }
 
     if (hasMedia && (titleChanged || playStateChanged)) {
       const icon = isPlaying ? "media-play" : "media-pause";
