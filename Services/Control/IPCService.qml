@@ -415,6 +415,10 @@ Singleton {
         CompositorService.lock();
       }
     }
+
+    function isLocked(): string {
+      return PanelService.lockScreen.active;
+    }
   }
 
   IpcHandler {
