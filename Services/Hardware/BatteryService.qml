@@ -332,8 +332,9 @@ Singleton {
 
     var title = I18n.tr(titleKey);
     var desc = I18n.tr(descKey, {
-                         "percent": getPercentage(device)
-                       });
+      "name": name,
+      "percent": getPercentage(device)
+    });
     var icon = level === "critical" ? "battery-exclamation" : "battery-charging-2";
 
     if (device == _bluetoothBattery && name) {

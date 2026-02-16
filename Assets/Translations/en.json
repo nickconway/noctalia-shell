@@ -1922,9 +1922,9 @@
     },
     "battery": {
       "critical": "Critical battery",
-      "critical-desc": "Battery is at {percent}% — please connect the charger immediately",
+      "critical-desc": "Battery for {name} is at {percent}% — please connect the charger immediately",
       "low": "Low battery",
-      "low-desc": "Battery is at {percent}% — please connect the charger"
+      "low-desc": "Battery for {name} is at {percent}% — please connect the charger"
     },
     "bluetooth": {
       "address-copied": "Address copied to clipboard",
