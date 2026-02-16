@@ -193,6 +193,12 @@ Singleton {
   // Internal loader to read a scheme file
   FileView {
     id: schemeReader
+    watchChanges: true
+
+    onFileChanged: {
+      applyScheme(path);
+    }
+
     onLoaded: {
       try {
         var data = JSON.parse(text());
