@@ -911,8 +911,12 @@ Singleton {
     function dismissPopup(id) {
         const index = findPopupIndex(id);
         if (index >= 0) {
+            const notifData = popupState[id];
+
+            if (notifData?.notification?.transient)
+                notifData.notification.dismiss();
+
             popupModel.remove(index);
-        }
     }
 
     function dismissOldestPopup() {
