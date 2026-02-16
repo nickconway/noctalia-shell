@@ -3,6 +3,7 @@ import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import qs.Commons
+import qs.Animations
 
 Item {
   id: root
@@ -21,6 +22,7 @@ Item {
   readonly property int status: imageSource ? imageSource.status : Image.Null
 
   Rectangle {
+    id: rectangle
     anchors.fill: parent
     radius: root.radius
     color: "transparent"
@@ -75,6 +77,7 @@ Item {
     }
 
     ShaderEffect {
+      id: effect
       anchors.fill: parent
       anchors.margins: root.borderWidth
       visible: !root.showFallback && root.imageSource !== null && root.status === Image.Ready
@@ -99,5 +102,9 @@ Item {
       icon: root.fallbackIcon
       pointSize: root.fallbackIconSize
     }
+  }
+
+  Fade on imagePath {
+    target: effect
   }
 }
